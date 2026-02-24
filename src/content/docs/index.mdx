@@ -1,0 +1,64 @@
+---
+title: StudyBuddy
+description: AI 驱动的个人知识成长伙伴，将碎片化学习转化为结构化知识体系
+template: splash
+hero:
+  tagline: AI 时代，会管比会做更有直接价值
+  actions:
+    - text: 开始学习
+      link: /tools/getting-started/
+      icon: right-arrow
+    - text: 浏览全部
+      link: /tools/
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 知识分类
+
+<CardGrid stagger>
+	<Card title="工具类" icon="setting">
+		AI 编程工具、效率工具、知识管理工具的使用指南
+	</Card>
+	<Card title="领域类" icon="document">
+		前端开发、后端开发、数据科学、技术管理等领域知识
+	</Card>
+	<Card title="方法论" icon="puzzle">
+		学习方法、思维框架、问题解决策略
+	</Card>
+</CardGrid>
+
+## 核心理念
+
+> **从记忆转向检索** — 不再死记硬背，而是快速理解框架，需要时精准检索
+
+StudyBuddy 采用「管理者视角」而非「实现者视角」：
+
+- **从深度转向广度** - 了解整体即可，知道「何时用」比「怎么用」更重要
+- **从线性转向网状** - 知识点之间的关联比单个知识点本身更有价值
+- **从执行转向管理** - 以管理者视角学习，关注决策而非细节实现
+
+## 三阶段学习法
+
+每个主题都遵循结构化的学习框架：
+
+<CardGrid>
+	<Card title="概览（5分钟）" icon="rocket">
+		一句话定义、核心问题、适用场景、前置知识、思维导图
+	</Card>
+	<Card title="详解（60分钟）" icon="open-book">
+		分章节讲解，每个概念包含「是什么 - 为什么 - 怎么用」
+	</Card>
+	<Card title="实战（25分钟）" icon="laptop">
+		初级/中级/高级难度分级练习，巩固所学
+	</Card>
+</CardGrid>
+
+## 技术栈
+
+| 技术 | 用途 |
+|------|------|
+| Astro + Starlight | 静态文档站点框架 |
+| Mermaid | Markdown 原生图表 |
+| Qoder Skills | AI 自动生成文档 |

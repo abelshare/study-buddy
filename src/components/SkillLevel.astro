@@ -1,0 +1,24 @@
+---
+interface Props {
+  level: 'beginner' | 'intermediate' | 'advanced';
+}
+
+const { level } = Astro.props;
+
+const labels = {
+  beginner: '初级',
+  intermediate: '中级',
+  advanced: '高级',
+};
+
+const icons = {
+  beginner: '🌱',
+  intermediate: '🌿',
+  advanced: '🌳',
+};
+---
+
+<span class={`skill-level ${level}`}>
+  <span class="icon">{icons[level]}</span>
+  <span class="label">{labels[level]}</span>
+</span>

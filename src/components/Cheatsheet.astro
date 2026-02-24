@@ -1,0 +1,22 @@
+---
+interface Props {
+  title: string;
+  items: { key: string; value: string }[];
+}
+
+const { title, items } = Astro.props;
+---
+
+<div class="cheatsheet">
+  <h4>{title}</h4>
+  <table>
+    <tbody>
+      {items.map((item) => (
+        <tr>
+          <td class="key"><code>{item.key}</code></td>
+          <td class="value">{item.value}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
