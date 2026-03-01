@@ -1,73 +1,147 @@
 ---
-title: AI Skill 规格
-description: StudyBuddy AI Skill 分层架构设计，主Skill调度 + 子Skill专业化处理
+title: AI Skill
+description: StudyBuddy 对话式学习架构设计，2 个核心 Skill + 2 个子代理
 sidebar:
   order: 4
 ---
 
-> 版本：v3.0 | 更新日期：2026-02-24
+> 版本：v4.0 | 更新日期：2026-02-28
 
-## 架构概览：分层调度
+## 架构概览：对话式学习
 
-采用「**主 Skill 调度 + 子 Skill 专业化**」的分层架构：
+采用「**对话式学习 + 按需沉淀**」的架构：
 
 ```
-learning-master (总调度)
-    │
-    ├── topic-analyzer (主入口)
-    │       ├── tools-analyzer    # 工具类分析
-    │       ├── domains-analyzer  # 领域类分析
-    │       └── methods-analyzer  # 方法论类分析
-    │
-    ├── outline-planner (主入口)
-    │       ├── tools-planner     # 工具类大纲
-    │       ├── domains-planner   # 领域类大纲
-    │       └── methods-planner   # 方法论类大纲
-    │
-    ├── content-writer (主入口)
-    │       ├── tools-writer      # 工具类写作
-    │       ├── domains-writer    # 领域类写作
-    │       └── methods-writer    # 方法论类写作
-    │
-    ├── visual-designer (主入口)
-    │       ├── tools-designer    # 工具类图表
-    │       ├── domains-designer  # 领域类图表
-    │       └── methods-designer  # 方法论类图表
-    │
-    └── quality-checker (主入口)
-            ├── tools-checker     # 工具类检查
-            ├── domains-checker   # 领域类检查
-            └── methods-checker   # 方法论类检查
+用户: /learning-master Docker
+        │
+        ▼
+┌─────────────────────────────────────┐
+│     learning-master (主控 Skill)      │
+│  ┌─────────────────────────────────┐  │
+│  │ 1. 入口判断（歧义？已有文档？）   │  │
+│  │ 2. 调用 background-analyzer     │  │
+│  │ 3. 对话式学习引导               │  │
+│  │ 4. 用户确认后触发沉淀           │  │
+│  └─────────────────────────────────┘  │
+└─────────────────────────────────────┘
+        │                    │
+        ▼                    ▼
+┌───────────────┐    ┌───────────────┐
+│ background-   │    │ freshness-    │
+│ analyzer      │    │ checker       │
+│ (背景分析代理) │    │ (新鲜度检测代理)│
+└───────────────┘    └───────────────┘
+        │
+        ▼
+┌─────────────────────────────────────┐
+│     knowledge-sync (沉淀 Skill)       │
+│     生成/更新文档、记录元信息          │
+└─────────────────────────────────────┘
 ```
 
 ---
 
-## 设计理念
+## 核心理念
 
-### 为什么拆分？
-
-| 问题 | 解决方案 |
-|------|----------|
-| 不同类型差异太大 | 每种类型有专属处理逻辑 |
-| 主 SKILL 太臃肿 | 主入口只负责调度 |
-| 维护困难 | 改某类型只需改对应文件 |
-
-### 职责划分
-
-**主 Skill**：
-- 接收输入
-- 判断类型
-- 调用对应子 Skill
-- 输出统一格式
-
-**子 Skill**：
-- 执行该类型的具体处理逻辑
-- 不需要判断类型，专注业务
-- 输出格式与主 Skill 定义一致
+| 理念 | 说明 |
+|------|------|
+| 只学框架 + 必要细节 | 不求全面，够用即可 |
+| 对话式学习 | AI 引导，用户反馈调整 |
+| 用户确认才沉淀 | 不主动写入文档 |
+| 类比优先 | 用已知解释未知 |
+| 知识有保鲜期 | 终身成长，活文档 |
 
 ---
 
-## 三种类型
+## 学习闭环
+
+```
+认知 → 决策 → 执行 → 验证 → 沉淀
+```
+
+---
+
+## 核心 Skill（2个）
+
+### learning-master
+
+**定位**：主控协调者
+
+**触发方式**：`/learning-master {主题}`
+
+**职责**：
+1. 入口判断（歧义检测、已有文档检查）
+2. 调用 background-analyzer 分析用户背景
+3. 对话式学习引导（确认目标→建立框架→必要细节）
+4. 按需调用 freshness-checker
+5. 用户确认后触发 knowledge-sync
+
+### knowledge-sync
+
+**定位**：知识沉淀专家
+
+**触发方式**：由 learning-master 调用
+
+**职责**：
+1. 接收学习成果数据
+2. 判断新建还是更新
+3. 生成/更新文档（图文结合）
+4. 记录元信息（版本、时间、新鲜度）
+
+---
+
+## 子代理（2个）
+
+### background-analyzer
+
+**定位**：用户背景分析专家
+
+**触发时机**：进入学习流程时
+
+**职责**：
+1. 检索用户已学习的文档
+2. 提取已掌握的知识领域
+3. 识别与新主题相关的知识
+4. 生成类比建议
+5. 建议可跳过的内容
+
+**输出示例**：
+```json
+{
+  "learned_topics": ["Python数据分析", "Docker"],
+  "analogy_suggestions": [
+    { "from": "DataFrame", "to": "Excel表格", "reason": "概念相似" }
+  ],
+  "skip_suggestions": [
+    { "content": "变量、函数、循环", "reason": "和JS共通，可跳过" }
+  ]
+}
+```
+
+### freshness-checker
+
+**定位**：知识新鲜度检测专家
+
+**触发时机**：主题涉及新技术/新版本时
+
+**职责**：
+1. 搜索主题的最新版本信息
+2. 对比版本变化
+3. 识别 breaking changes
+4. 返回更新建议
+
+**新鲜度状态**：
+
+| 状态 | 含义 | 建议 |
+|------|------|------|
+| `stable` | 稳定，无重大变化 | 可放心学习 |
+| `evolving` | 演进中，有新特性 | 关注新版本 |
+| `deprecated` | 部分废弃 | 注意迁移 |
+| `major_update` | 大版本更新 | 建议重新学习 |
+
+---
+
+## 三种知识类型
 
 | 类型 | 定位 | 学习目标 | 文档重点 |
 |------|------|----------|----------|
@@ -75,110 +149,25 @@ learning-master (总调度)
 | **domains（领域类）** | 技术领域/问题域 | 懂全局、能决策 | 概念、关系、选型依据 |
 | **methods（方法论）** | 学习方法/思维框架 | 会思考、能迁移 | 步骤、场景、误区 |
 
-### 类型判断
-
+**类型判断**：
 1. 是否围绕一个工具/产品的使用与配置？→ **tools**
 2. 是否讨论某个技术领域的整体知识？→ **domains**
-3. 是否讲"如何学习/如何思考/如何解决问题"？→ **methods**
-
----
-
-## 各阶段差异化处理
-
-### topic-analyzer：差异化分析
-
-| 类型 | type_specific 输出 |
-|------|-------------------|
-| tools | core_commands、common_pitfalls、config_highlights |
-| domains | tech_stack_relations、decision_factors、trends |
-| methods | steps、applicable_scenarios、not_applicable、common_mistakes |
-
-### outline-planner：差异化大纲
-
-| 类型 | 详解结构 | 实战形式 |
-|------|----------|----------|
-| tools | 是什么/为什么/怎么用（命令） | 手把手操作 |
-| domains | 是什么/对比/选型依据 | 案例分析 |
-| methods | 是什么/步骤/误区 | 场景应用 |
-
-### content-writer：差异化写作
-
-| 类型 | 写作重点 |
-|------|----------|
-| tools | 命令可运行、参数合理、常见坑覆盖 |
-| domains | 选型依据充分、技术关系清晰、决策过程完整 |
-| methods | 步骤清晰、场景明确、误区覆盖 |
-
-### visual-designer：差异化图表
-
-| 类型 | 核心图表 | 图表重点 |
-|------|----------|----------|
-| tools | mindmap + flowchart | 操作流程、命令关系 |
-| domains | mindmap + flowchart | 技术栈关系、决策流程 |
-| methods | flowchart + mindmap | 方法步骤、应用场景 |
-
-### quality-checker：差异化检查
-
-| 类型 | 重点检查项 |
-|------|------------|
-| tools | 命令可运行、常见坑覆盖 |
-| domains | 选型依据充分、技术关系清晰 |
-| methods | 步骤清晰、场景明确、误区覆盖 |
-
----
-
-## 上下文传递
-
-整个流水线的数据流：
-
-```
-topic-analyzer 输出（JSON）
-    ↓ 完整传递
-outline-planner ← analysis
-    ↓ 完整传递
-content-writer ← analysis + outline
-visual-designer ← analysis + outline
-    ↓ 完整传递
-quality-checker ← analysis + full_content
-```
-
-**关键规则**：
-- analysis 是后续所有 Skill 的唯一来源
-- 不允许"另起炉灶"重新生成已定义的内容
+3. 是否讲「如何学习/如何思考/如何解决问题」？→ **methods**
 
 ---
 
 ## 文件结构
 
 ```
-.qoder/skills/
-├── learning-master/
-│   └── SKILL.md                    # 总调度
-├── topic-analyzer/
-│   ├── SKILL.md                    # 主入口
-│   ├── tools-analyzer.md           # 工具类分析
-│   ├── domains-analyzer.md         # 领域类分析
-│   └── methods-analyzer.md         # 方法论类分析
-├── outline-planner/
-│   ├── SKILL.md
-│   ├── tools-planner.md
-│   ├── domains-planner.md
-│   └── methods-planner.md
-├── content-writer/
-│   ├── SKILL.md
-│   ├── tools-writer.md
-│   ├── domains-writer.md
-│   └── methods-writer.md
-├── visual-designer/
-│   ├── SKILL.md
-│   ├── tools-designer.md
-│   ├── domains-designer.md
-│   └── methods-designer.md
-└── quality-checker/
-    ├── SKILL.md
-    ├── tools-checker.md
-    ├── domains-checker.md
-    └── methods-checker.md
+.qoder/
+├── skills/
+│   ├── learning-master/
+│   │   └── SKILL.md          # 主控 Skill
+│   └── knowledge-sync/
+│       └── SKILL.md          # 沉淀 Skill
+└── agents/
+    ├── background-analyzer.md  # 背景分析代理
+    └── freshness-checker.md    # 新鲜度检测代理
 ```
 
 ---
@@ -189,22 +178,38 @@ quality-checker ← analysis + full_content
 /learning-master Docker
 ```
 
-系统自动：
-1. 判断 Docker 属于 tools/efficiency
-2. 调用 tools-analyzer 分析
-3. 调用 tools-planner 生成大纲
-4. 调用 tools-writer 撰写内容
-5. 调用 tools-designer 生成图表
-6. 调用 tools-checker 检查质量
-7. 输出文档
+对话流程：
+```
+📚 开始学习：Docker
+
+基于你的背景分析：
+- 你已掌握：Linux基础、Git
+- 可类比：镜像 ≈ 虚拟机快照
+- 建议跳过：基础命令行操作
+- 重点放在：容器编排、生产实践
+
+这个学习路径可以吗？
+```
+
+用户反馈会影响后续内容：
+
+| 反馈 | AI 行为 |
+|------|--------|
+| 「懂了」 | 进入下一阶段或触发沉淀 |
+| 「不太懂」 | 换个角度、换个类比 |
+| 「这个我知道」 | 跳过 |
+| 「太细了」 | 回到框架层面 |
+| 「可以沉淀了」 | 触发 knowledge-sync |
 
 ---
 
-## 优势总结
+## 对比旧架构
 
-| 维度 | 改进前 | 改进后 |
-|------|--------|--------|
-| 架构 | 单文件混合逻辑 | 分层架构，职责清晰 |
-| 维护 | 改一处影响全局 | 改某类型只改对应文件 |
-| 扩展 | 新增类型要改多处 | 只需添加新子 Skill |
-| 清晰度 | 规则混在一起 | 每种类型独立规范 |
+| 维度 | 旧架构（v3） | 新架构（v4） |
+|------|-------------|-------------|
+| 模式 | 线性流水线 | 对话式学习 |
+| Skill 数量 | 6个 | 2个 |
+| 用户参与 | 无 | 每步确认 |
+| 沉淀时机 | 自动输出 | 用户确认才沉淀 |
+| 背景感知 | 无 | 已学知识类比 |
+| 知识保鲜 | 无 | 新鲜度检测 |

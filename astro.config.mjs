@@ -20,6 +20,15 @@ export default defineConfig({
 			},
 			sidebar: [
 				{
+					label: '快速开始',
+					items: [
+						{ label: '使用指南', link: '/project/usage/' },
+						{ label: '项目简介', link: '/project/brief/' },
+						{ label: '技术架构', link: '/project/architecture/' },
+						{ label: 'AI Skill', link: '/project/ai-skills/' },
+					],
+				},
+				{
 					label: '工具类',
 					autogenerate: { directory: 'tools' },
 				},
@@ -30,10 +39,6 @@ export default defineConfig({
 				{
 					label: '方法论',
 					autogenerate: { directory: 'methods' },
-				},
-				{
-					label: '项目设计',
-					autogenerate: { directory: 'project' },
 				},
 			],
 		}),

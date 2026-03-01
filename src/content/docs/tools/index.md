@@ -19,10 +19,11 @@ description: AI 编程工具、效率工具、知识管理工具的使用指南
 - Git - 版本控制
 - VS Code - 代码编辑器
 
+### 数据流处理
+- [Apache NiFi](/tools/nifi/) - 可视化数据流编排引擎
+
 ### 知识管理
 - Obsidian - 双向链接笔记
 - Notion - 多功能工作空间
 
-## 开始学习
 
-推荐从 [快速开始指南](/tools/getting-started/) 开始你的学习之旅。
