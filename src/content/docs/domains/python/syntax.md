@@ -3,8 +3,6 @@ title: 基础语法对照
 description: JavaScript vs Python 语法对照表
 ---
 
-# 基础语法对照
-
 > **核心策略**：找到 JS 和 Python 的对应关系，快速迁移知识
 
 ---

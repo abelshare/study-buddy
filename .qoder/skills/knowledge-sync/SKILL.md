@@ -212,6 +212,7 @@ mindmap
 - 多文件目录必须有 index.md
 - 代码块必须指定语言
 - mermaid 图表不使用 fill/style 等样式
+- 标题层级：frontmatter 的 title 已渲染为 H1，内容必须从 ## 开始，禁止使用 # 一级标题
 ```
 
 ---
