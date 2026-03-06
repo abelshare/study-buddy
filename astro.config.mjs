@@ -4,10 +4,32 @@ import starlight from '@astrojs/starlight';
 import starlightThemeObsidian from 'starlight-theme-obsidian';
 import mermaid from 'astro-mermaid';
 
+// Rehype 插件：为内部链接添加 base 前缀
+function rehypeAddBasePrefix(base) {
+	return (tree) => {
+		function visit(node) {
+			if (node.type === 'element' && node.tagName === 'a' && node.properties?.href) {
+				const href = node.properties.href;
+				// 只处理以 / 开头的内部链接（排除外部链接和锚点链接）
+				if (href.startsWith('/') && !href.startsWith('//') && !href.startsWith(base)) {
+					node.properties.href = base + href;
+				}
+			}
+			if (node.children) {
+				node.children.forEach(visit);
+			}
+		}
+		visit(tree);
+	};
+}
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://abelshare.github.io',
 	base: '/study-buddy',
+	markdown: {
+		rehypePlugins: [[rehypeAddBasePrefix, '/study-buddy']],
+	},
 	integrations: [
 		starlight({
 			plugins: [starlightThemeObsidian()],
