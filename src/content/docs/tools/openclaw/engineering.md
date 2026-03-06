@@ -314,4 +314,4 @@ workflows/
 
 ---
 
-**下一步**：了解 [工作流集成](/tools/openclaw/integration/)
+**下一步**：了解 [工作流集成](./integration/)

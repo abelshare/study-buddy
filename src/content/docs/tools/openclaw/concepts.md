@@ -303,4 +303,4 @@ Layer 1: 基础 Skills（低阶）
 
 ---
 
-**下一步**：了解 [应用场景](/tools/openclaw/scenarios/)
+**下一步**：了解 [应用场景](./scenarios/)
