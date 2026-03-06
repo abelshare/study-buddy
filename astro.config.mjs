@@ -6,6 +6,8 @@ import mermaid from 'astro-mermaid';
 
 // https://astro.build/config
 export default defineConfig({
+	site: 'https://abelshare.github.io',
+	base: '/study-buddy',
 	integrations: [
 		starlight({
 			plugins: [starlightThemeObsidian()],
